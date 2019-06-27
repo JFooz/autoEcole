@@ -1,13 +1,17 @@
 package com.fooz.autoEcole;
 
+import java.time.LocalDateTime;
+
 /**
  * Hello world!
  *
  */
-public class App 
+public class App
 {
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
-    }
+	public static void main( String[] args )
+	{
+		System.out.println( "Hello World!" );
+		LocalDateTime date = LocalDateTime.now();
+		System.out.println(date);
+	}
 }
