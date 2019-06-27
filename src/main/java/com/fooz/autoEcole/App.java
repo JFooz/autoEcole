@@ -1,6 +1,6 @@
 package com.fooz.autoEcole;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.fooz.autoEcole.bdd.AccessBdd;
@@ -12,11 +12,7 @@ import com.fooz.autoEcole.entities.Client;
  */
 public class App
 {
-	public static void main( String[] args )
-	{
-		System.out.println( "Hello World!" );
-		LocalDateTime date = LocalDateTime.now();
-		System.out.println(date);
+	public static void main( String[] args ) {
 
 		AccessBdd accessBdd = new AccessBdd();
 		List<Client> clientList = accessBdd.getAllClient();
@@ -24,6 +20,8 @@ public class App
 			System.out.println(client.getNom()+ " "+ client.getPrenom());
 		}
 
-
+		LocalDate myDate = LocalDate.of(1965, 5, 5);
+		Client client = new Client(0, "john", "doe", "n/a", myDate);
+		accessBdd.addClient(client);
 	}
 }

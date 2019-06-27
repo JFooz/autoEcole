@@ -2,6 +2,7 @@ package com.fooz.autoEcole.bdd;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -16,7 +17,9 @@ public class AccessBdd {
 	//Variables qui permettent d'interagir avec la BDD
 	private Connection connect = null;
 	private Statement statement = null;
+	private PreparedStatement  preparedStatement = null;
 	private ResultSet resultSet = null;
+	private final String driver = "com.mysql.jdbc.Driver";
 
 	//Variables qui permettent de se connecter au serveur de la BDD
 	private String user = "root";
@@ -33,7 +36,7 @@ public class AccessBdd {
 
 		try {
 			//Chargement du Driver Mysql
-			Class.forName("com.mysql.jdbc.Driver");
+			Class.forName(this.driver);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -93,5 +96,45 @@ public class AccessBdd {
 		}
 
 		return clientList;
+	}
+
+	public void addClient(Client client) {
+
+		try {
+			Class.forName(this.driver);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			this.connect = DriverManager.getConnection(this.url, this.user, this.mdp);
+			this.preparedStatement = this.connect.prepareStatement("INSERT INTO auto.client VALUES (default, ?, ?, ?, ?)");
+			this.preparedStatement.setString(1, client.getNom());
+			this.preparedStatement.setString(2, client.getPrenom());
+			this.preparedStatement.setString(3, client.getAdresse());
+			this.preparedStatement.setString(4, client.getNaissanceDate().toString());
+			this.preparedStatement.executeUpdate();
+			System.out.println("Client enregistré");
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+
+		}finally {
+			if (this.connect != null) {
+				try {
+					this.connect.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (this.preparedStatement != null) {
+				try {
+					this.preparedStatement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 }
