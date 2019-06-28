@@ -7,10 +7,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fooz.autoEcole.entities.Client;
+import com.fooz.autoEcole.entities.SeanceCode;
 
 public class AccessBdd {
 
@@ -136,5 +138,114 @@ public class AccessBdd {
 				}
 			}
 		}
+	}
+
+	public List<SeanceCode> getAllSeanceCode() {
+
+		List<SeanceCode> seanceCodeList = new ArrayList<>();
+
+		try {
+			//Chargement du Driver Mysql
+			Class.forName(this.driver);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		try {
+			//Paramètre et établit la connection
+			this.connect = DriverManager.getConnection(this.url, this.user, this.mdp);
+
+			//Création du Statement pour l'execution des requêtes
+			this.statement = this.connect.createStatement();
+
+			//Execute et stocke les résultats de la requête
+			this.resultSet = this.statement.executeQuery("SELECT * FROM auto.seance_code");
+
+			//Boucle pour parcourir le resultSet et instancier les objets clients, puis les ajouter à la liste
+			while(this.resultSet.next()) {
+
+				//Set les resultats de la requête dans les variables locales
+				int id = this.resultSet.getInt("seanceId");
+				String lieu = this.resultSet.getString("lieu");
+				LocalDate seanceCodeDate = this.resultSet.getDate("date").toLocalDate();
+				LocalTime seanceHeure = this.resultSet.getTime("heure").toLocalTime();
+				boolean estExamen = this.resultSet.getBoolean("estExamen");
+
+				//Création du client et ajout dans la liste
+				SeanceCode seanceCode = new SeanceCode(id, seanceCodeDate, seanceHeure, lieu, estExamen);
+				seanceCodeList.add(seanceCode);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+
+		} finally {
+
+			if (this.connect != null) {
+				try {
+					this.connect.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (this.statement != null) {
+				try {
+					this.statement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (this.resultSet != null) {
+				try {
+					this.resultSet.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return seanceCodeList;
+	}
+
+	public void addSeanceCode(SeanceCode seanceCode) {
+
+		try {
+			Class.forName(this.driver);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			this.connect = DriverManager.getConnection(this.url, this.user, this.mdp);
+			this.preparedStatement = this.connect.prepareStatement("INSERT INTO auto.seance_code VALUES (default, ?, ?, ?, ?, 1)");
+			this.preparedStatement.setString(1, seanceCode.getSeanceDate().toString());
+			this.preparedStatement.setString(2, seanceCode.getSeanceHeure().toString());
+			this.preparedStatement.setString(3, seanceCode.getLieu());
+			this.preparedStatement.setBoolean(4, seanceCode.isEstExamen());
+			this.preparedStatement.executeUpdate();
+			System.out.println("Séance enregistré");
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+
+		}finally {
+			if (this.connect != null) {
+				try {
+					this.connect.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (this.preparedStatement != null) {
+				try {
+					this.preparedStatement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
 	}
 }
